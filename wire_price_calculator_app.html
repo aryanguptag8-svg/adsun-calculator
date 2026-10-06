@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wire Craft Pro - Industrial Wire Price Calculator</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        copper: {
+                            50: '#fff7ed',
+                            100: '#ffedd5',
+                            500: '#d97706',
+                            600: '#b45309',
+                            700: '#92400e',
+                            800: '#78350f',
+                            900: '#451a03',
+                        },
+                        industrial: {
+                            800: '#1e293b',
+                            900: '#0f172a',
+                            950: '#020617',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        /* Custom scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.1);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(180,83,9,0.4);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(180,83,9,0.7);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-industrial-950 text-gray-800 dark:text-gray-100 min-h-screen transition-colors duration-200">
+
+    <header class="border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-industrial-900/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-600 via-copper-500 to-amber-400 flex items-center justify-center text-white shadow-lg shadow-amber-500/20">
+                    <i class="fa-solid fa-bolt text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight tracking-tight text-gray-900 dark:text-white">Adsun Industries<span class="text-copper-500"></span></h1>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Price Calculation Engine</p>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-3">
+                <button id="currencyToggle" class="px-3 py-1.5 rounded-lg border border-gray-300 dark:border-gray-700 text-xs font-semibold hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                    <i class="fa-solid fa-coins mr-1 text-copper-500"></i> Currency: <span id="currencySymbolText">₹ (INR)</span>
+                </button>
+                <button id="themeToggle" class="p-2 rounded-lg border border-gray-300 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                    <i class="fa-solid fa-moon dark:hidden"></i>
+                    <i class="fa-solid fa-sun hidden dark:inline"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Preset Standards Banner -->
+        <div class="mb-6 bg-white dark:bg-industrial-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-sm">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="flex items-center space-x-3">
+                    <i class="fa-solid fa-sliders text-copper-500 text-xl"></i>
+                    <div>
+                        <h2 class="text-sm font-semibold text-gray-900 dark:text-white">Quick Preset Standard Configurations (IS 694 / IEC 60228)</h2>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Select a standard size to automatically load nominal strand specs</p>
+                    </div>
+                </div>
+                <div class="flex flex-wrap gap-2" id="presetButtons">
+                    <!-- Javascript will populate preset pills -->
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <!-- Left Input Controls Panel -->
+            <div class="lg:col-span-6 space-y-6">
+                <div class="bg-white dark:bg-industrial-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-sm">
+                    <div class="flex items-center justify-between pb-4 mb-4 border-b border-gray-100 dark:border-gray-800">
+                        <h2 class="font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                            <i class="fa-solid fa-ruler-combined text-copper-500"></i>
+                            1. Technical Specifications
+                        </h2>
+                        <span class="text-xs px-2.5 py-1 bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded-full font-medium">Standard Formula</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- Nominal Size Dropdown -->
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">
+                                Wire Nominal Size (sq mm)
+                            </label>
+                            <select id="wireSizeSelect" class="w-full bg-gray-50 dark:bg-industrial-800 border border-gray-300 dark:border-gray-700 rounded-xl px-3.5 py-2.5 text-sm font-medium focus:ring-2 focus:ring-copper-500 focus:outline-none">
+                                <option value="0.5">0.50 sq mm</option>
+                                <option value="0.75">0.75 sq mm</option>
+                                <option value="1.0" selected>1.00 sq mm</option>
+                                <option value="1.5">1.50 sq mm</option>
+                                <option value="2.5">2.50 sq mm</option>
+                                <option value="4.0">4.00 sq mm</option>
+                                <option value="6.0">6.00 sq mm</option>
+                                <option value="10.0">10.00 sq mm</option>
+                            </select>
+                        </div>
+
+                        <!-- Strand Gauge Input -->
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5 flex items-center justify-between">
+                                <span>Strand Diameter (gauge)</span>
+                                <i class="fa-solid fa-circle-info text-gray-400 text-xs" title="Diameter of a single copper strand in gauge"></i>
+                            </label>
+                            <input type="number" step="0.25" id="strandGauge" value="10.00" class="w-full bg-gray-50 dark:bg-industrial-800 border border-gray-300 dark:border-gray-700 rounded-xl px-3.5 py-2.5 text-sm font-mono font-medium focus:ring-2 focus:ring-copper-500 focus:outline-none">
+                        </div>
+
+                        <!-- Number of Strands -->
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">
+                                Number of Strands
+                            </label>
+                            <input type="number" id="numStrands" value="14" class="w-full bg-gray-50 dark:bg-industrial-800 border border-gray-300 dark:border-gray-700 rounded-xl px-3.5 py-2.5 text-sm font-mono font-medium focus:ring-2 focus:ring-copper-500 focus:outline-none">
+                        </div>
+
+                        <!-- Coil Length -->
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">
+                                Coil Length (Meters)
+                            </label>
+                            <input type="number" id="coilLength" value="90" class="w-full bg-gray-50 dark:bg-industrial-800 border border-gray-300 dark:border-gray-700 rounded-xl px-3.5 py-2.5 text-sm font-mono font-medium focus:ring-2 focus:ring-copper-500 focus:outline-none">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cost Parameters Section -->
+                <div class="bg-white dark:bg-industrial-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-sm">
+                    <div class="flex items-center justify-between pb-4 mb-4 border-b border-gray-100 dark:border-gray-800">
+                        <h2 class="font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                            <i class="fa-solid fa-tags text-copper-500"></i>
+                            2. Raw Materials & Overhead Costs
+                        </h2>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <!-- Raw Copper Rate -->
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">
+                                    Raw Copper Rate <bold>Including Drawing</bold> (<span class="currency-label">₹</span>/Kg)
+                                </label>
+                                <div class="relative">
+                                    <span class="absolute left-3.5 top-2.5 text-gray-400 font-mono text-sm currency-label">₹</span>
+                                    <input type="number" id="copperRate" value="850" class="w-full bg-gray-50 dark:bg-industrial-800 border border-gray-300 dark:border-gray-700 rounded-xl pl-8 pr-3.5 py-2.5 text-sm font-mono font-medium focus:ring-2 focus:ring-copper-500 focus:outline-none">
+                                </div>
+                            </div>
+
+                            <!-- PVC Insulation Cost -->
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">
+                                    PVC Insulation / Coil (<span class="currency-label">₹</span>)
+                                </label>
+                                <div class="relative">
+                                    <span class="absolute left-3.5 top-2.5 text-gray-400 font-mono text-sm currency-label">₹</span>
+                                    <input type="number" id="pvcCost" value="120" class="w-full bg-gray-50 dark:bg-industrial-800 border border-gray-300 dark:border-gray-700 rounded-xl pl-8 pr-3.5 py-2.5 text-sm font-mono font-medium focus:ring-2 focus:ring-copper-500 focus:outline-none">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Overhead Expenses -->
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5 flex items-center justify-between">
+                                <span>Packaging, Labor & Power Overheads / Coil (<span class="currency-label">₹</span>)</span>
+                                <i class="fa-solid fa-circle-info text-gray-400 text-xs" title="Master carton, spooling, electricity and labor cost per coil"></i>
+                            </label>
+                            <div class="relative">
+                                <span class="absolute left-3.5 top-2.5 text-gray-400 font-mono text-sm currency-label">₹</span>
+                                <input type="number" id="overheadCost" value="50" class="w-full bg-gray-50 dark:bg-industrial-800 border border-gray-300 dark:border-gray-700 rounded-xl pl-8 pr-3.5 py-2.5 text-sm font-mono font-medium focus:ring-2 focus:ring-copper-500 focus:outline-none">
+                            </div>
+                        </div>
+
+                        <!-- Profit Margin Slider -->
+                        <div class="pt-2">
+                            <div class="flex justify-between items-center mb-1.5">
+                                <label class="text-xs font-semibold text-gray-600 dark:text-gray-400">Target Profit Margin (%)</label>
+                                <span id="marginValue" class="text-sm font-bold font-mono text-copper-500">15%</span>
+                            </div>
+                            <input type="range" id="profitMargin" min="0" max="50" step="0.5" value="15" class="w-full accent-copper-500 h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                            <div class="flex justify-between text-[10px] text-gray-400 mt-1">
+                                <span>0% (At Cost)</span>
+                                <span>25%</span>
+                                <span>50% (High Margin)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Key Metrics & Visual Dashboard -->
+            <div class="lg:col-span-6 space-y-6">
+                <!-- Summary Metrics Grid -->
+                <div class="grid grid-cols-2 gap-4">
+                    <!-- Copper Weight Card -->
+                    <div class="bg-white dark:bg-industrial-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-sm relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 w-16 h-16 bg-amber-500/5 rounded-bl-full pointer-events-none"></div>
+                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Copper Weight / Coil</p>
+                        <h3 id="copperWeightKg" class="text-2xl font-extrabold text-gray-900 dark:text-white mono">0.510 kg</h3>
+                        <p id="copperWeightGrams" class="text-xs text-amber-600 dark:text-amber-400 font-mono mt-0.5">(510.30 grams)</p>
+                        <div class="mt-2 text-[10px] text-gray-400 flex items-center gap-1">
+                            <i class="fa-solid fa-calculator"></i>
+                            <span>Gauge² × 405 × Strands</span>
+                        </div>
+                    </div>
+
+                    <!-- Pure Copper Cost Card -->
+                    <div class="bg-white dark:bg-industrial-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-sm relative overflow-hidden">
+                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Raw Copper Cost</p>
+                        <h3 id="copperCostVal" class="text-2xl font-extrabold text-copper-600 dark:text-copper-500 mono">₹433.76</h3>
+                        <p class="text-xs text-gray-400 mt-0.5">At <span id="currentCopperRateTag" class="mono">850</span>/<span class="weight-unit">kg</span></p>
+                        <div class="mt-2 text-[10px] text-gray-400 flex items-center gap-1">
+                            <i class="fa-solid fa-cube"></i>
+                            <span>Pure metal expenditure</span>
+                        </div>
+                    </div>
+
+                    <!-- Manufacturing Cost Card -->
+                    <div class="bg-white dark:bg-industrial-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-sm">
+                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Total Mfg Cost / Coil</p>
+                        <h3 id="totalMfgCost" class="text-2xl font-extrabold text-gray-900 dark:text-white mono">₹603.76</h3>
+                        <p class="text-xs text-gray-400 mt-0.5">Copper + PVC + Overhead</p>
+                        <div class="mt-2 text-[10px] text-gray-400 flex items-center gap-1">
+                            <i class="fa-solid fa-industry"></i>
+                            <span>Break-even cost</span>
+                        </div>
+                    </div>
+
+                    <!-- Suggested Selling Price Card -->
+                    <div class="bg-gradient-to-br from-amber-500 to-copper-600 text-white rounded-2xl p-4 shadow-lg shadow-amber-500/20 relative overflow-hidden">
+                        <p class="text-xs font-medium text-amber-100 mb-1">Selling Price / Coil</p>
+                        <h3 id="sellingPrice" class="text-2xl font-extrabold mono">₹694.32</h3>
+                        <p class="text-xs text-amber-100 mt-0.5">Profit: <span id="profitPerCoil" class="font-bold mono">₹90.56</span></p>
+                        <div class="mt-2 text-[10px] text-amber-200 flex items-center gap-1">
+                            <i class="fa-solid fa-chart-line"></i>
+                            <span>Target Margin Applied</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visual Breakdown Chart -->
+                <div class="bg-white dark:bg-industrial-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                            <i class="fa-solid fa-chart-pie text-copper-500"></i>
+                            Cost Breakdown
+                        </h3>
+                        <span class="text-xs text-gray-400">Per Coil Structure</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+                        <div class="md:col-span-6 h-48 relative flex items-center justify-center">
+                            <canvas id="costChart"></canvas>
+                        </div>
+                        <div class="md:col-span-6 space-y-2.5 text-xs">
+                            <div class="flex items-center justify-between p-2 rounded-lg bg-gray-50 dark:bg-industrial-800">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span>
+                                    <span class="text-gray-600 dark:text-gray-300">Copper Metal</span>
+                                </div>
+                                <span id="pctCopper" class="font-bold mono">71.8%</span>
+                            </div>
+                            <div class="flex items-center justify-between p-2 rounded-lg bg-gray-50 dark:bg-industrial-800">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-3 h-3 rounded-full bg-blue-500 inline-block"></span>
+                                    <span class="text-gray-600 dark:text-gray-300">PVC Insulation</span>
+                                </div>
+                                <span id="pctPvc" class="font-bold mono">19.9%</span>
+                            </div>
+                            <div class="flex items-center justify-between p-2 rounded-lg bg-gray-50 dark:bg-industrial-800">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-3 h-3 rounded-full bg-purple-500 inline-block"></span>
+                                    <span class="text-gray-600 dark:text-gray-300">Overheads</span>
+                                </div>
+                                <span id="pctOverhead" class="font-bold mono">8.3%</span>
+                            </div>
+                            <div class="flex items-center justify-between p-2 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span>
+                                    <span class="font-semibold">Profit Share</span>
+                                </div>
+                                <span id="pctProfit" class="font-bold mono">13.0%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Toolbar & Saved Quotations -->
+                <div class="flex flex-wrap gap-3">
+                    <button id="addQuoteBtn" class="flex-1 bg-industrial-800 hover:bg-industrial-900 dark:bg-copper-600 dark:hover:bg-copper-700 text-white font-semibold py-3 px-4 rounded-xl text-sm transition flex items-center justify-center gap-2 shadow-sm">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Add to Batch Quote</span>
+                    </button>
+                    <button id="exportPrintBtn" class="bg-white dark:bg-industrial-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-industrial-700 text-gray-800 dark:text-gray-200 font-semibold py-3 px-4 rounded-xl text-sm transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-file-pdf text-red-500"></i>
+                        <span>Print / Save Summary</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Saved Comparison Batch Table -->
+        <div class="mt-8 bg-white dark:bg-industrial-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-sm">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h3 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                        <i class="fa-solid fa-list-check text-copper-500"></i>
+                        Batch Quotation Summary
+                    </h3>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Compare multiple wire specifications for production or customer estimates</p>
+                </div>
+                <button id="clearBatchBtn" class="text-xs text-red-500 hover:text-red-700 dark:hover:text-red-400 font-semibold">
+                    <i class="fa-solid fa-trash mr-1"></i> Clear List
+                </button>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-gray-200 dark:border-gray-800 text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold">
+                            <th class="py-3 px-3">Wire Spec</th>
+                            <th class="py-3 px-3">Strands/Gauge</th>
+                            <th class="py-3 px-3">Coil Length</th>
+                            <th class="py-3 px-3">Cu Weight</th>
+                            <th class="py-3 px-3">Mfg Cost</th>
+                            <th class="py-3 px-3">Selling Price</th>
+                            <th class="py-3 px-3">Profit/Coil</th>
+                            <th class="py-3 px-3 text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="batchTableBody" class="divide-y divide-gray-100 dark:divide-gray-800 text-sm font-mono">
+                        <!-- Batch items populated here -->
+                        <tr id="emptyBatchRow" class="text-center font-sans text-gray-400 text-xs">
+                            <td colspan="8" class="py-6">No wire estimates added yet. Click "Add to Batch Quote" above.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Printable Modal / Summary Card -->
+    <div id="printModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white text-gray-900 max-w-xl w-full rounded-2xl p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <button id="closeModalBtn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div id="printableArea" class="space-y-6">
+                <!-- Quotation Header -->
+                <div class="border-b pb-4 flex justify-between items-start">
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-900">WIRE COST ESTIMATION SHEET</h2>
+                        <p class="text-xs text-gray-500">WireCraft Pro Manufacturing Engine</p>
+                    </div>
+                    <div class="text-right text-xs text-gray-500">
+                        <p>Date: <span id="quoteDate">2026-10-07</span></p>
+                        <p>Ref: #WC-<span id="quoteRef">8942</span></p>
+                    </div>
+                </div>
+
+                <!-- Parameters Summary -->
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Technical Parameters</h4>
+                    <div class="grid grid-cols-2 gap-2 text-xs bg-gray-50 p-3 rounded-lg font-mono">
+                        <div>Nominal Size: <span id="modalNominal" class="font-bold">1.0 sq mm</span></div>
+                        <div>Strand Spec: <span id="modalStrandSpec" class="font-bold">14 / 0.30 mm</span></div>
+                        <div>Coil Length: <span id="modalCoilLen" class="font-bold">90 Meters</span></div>
+                        <div>Copper Weight: <span id="modalCuWeight" class="font-bold">0.510 Kg</span></div>
+                    </div>
+                </div>
+
+                <!-- Financial Breakdown -->
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Commercial Breakdown</h4>
+                    <table class="w-full text-xs font-mono">
+                        <tbody class="divide-y">
+                            <tr>
+                                <td class="py-2 text-gray-600">Raw Copper Cost (@ <span id="modalCuRate">850</span>/<span class="weight-unit">kg</span>)</td>
+                                <td class="py-2 text-right font-bold" id="modalCuCost">₹433.76</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 text-gray-600">PVC Insulation Cost</td>
+                                <td class="py-2 text-right font-bold" id="modalPvcCost">₹120.00</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 text-gray-600">Packing, Labor & Overhead Expenses</td>
+                                <td class="py-2 text-right font-bold" id="modalOverheadCost">₹50.00</td>
+                            </tr>
+                            <tr class="bg-gray-50">
+                                <td class="py-2 font-bold text-gray-900">Total Manufacturing Cost</td>
+                                <td class="py-2 text-right font-bold text-gray-900" id="modalMfgCost">₹603.76</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 text-gray-600">Target Margin (<span id="modalMarginPct">15</span>%)</td>
+                                <td class="py-2 text-right font-bold text-emerald-600" id="modalProfit">₹90.56</td>
+                            </tr>
+                            <tr class="border-t-2 border-gray-900 bg-amber-50">
+                                <td class="py-2.5 font-bold text-sm text-gray-900">Suggested Selling Price / Coil</td>
+                                <td class="py-2.5 text-right font-bold text-sm text-amber-700" id="modalSellPrice">₹694.32</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="text-[10px] text-gray-400 border-t pt-3 italic text-center">
+                    Formula applied: Grams Cu = Diameter² × 405 × Strands (scaled to coil length).
+                </div>
+            </div>
+
+            <div class="mt-6 flex justify-end gap-3 border-t pt-4">
+                <button id="triggerPrintBtn" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold px-4 py-2 rounded-lg flex items-center gap-1.5">
+                    <i class="fa-solid fa-print"></i> Print Document
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Preset specifications mapping based on standard IS 694 / IEC 60228
+        const PRESETS = [
+            { label: '0.75 mm²', size: '0.75', strands: 24, gauge: 9.00 },
+            { label: '0.75 mm²', size: '0.75', strands: 24, gauge: 10.00 },
+            { label: '0.75 mm²', size: '0.75', strands: 24, gauge: 11.00 },
+            { label: '1.0 mm²', size: '1.0', strands: 14, gauge: 9.00 },
+            { label: '1.0 mm²', size: '1.0', strands: 14, gauge: 10.00 },
+            { label: '1.0 mm²', size: '1.0', strands: 14, gauge: 11.00 },
+            { label: '1.5 mm²', size: '1.5', strands: 22, gauge: 9.00 },
+            { label: '1.5 mm²', size: '1.5', strands: 22, gauge: 10.00 },
+            { label: '1.5 mm²', size: '1.5', strands: 22, gauge: 11.00 },
+            { label: '2.5 mm²', size: '2.5', strands: 36, gauge: 9.00 },
+            { label: '2.5 mm²', size: '2.5', strands: 36, gauge: 10.00 },
+            { label: '2.5 mm²', size: '2.5', strands: 36, gauge: 11.00 },
+            { label: '4.0 mm²', size: '4.0', strands: 56, gauge: 9.00 },
+	    { label: '4.0 mm²', size: '4.0', strands: 56, gauge: 10.00 },
+	    { label: '4.0 mm²', size: '4.0', strands: 56, gauge: 11.00 },
+            { label: '6.0 mm²', size: '6.0', strands: 84, gauge: 9.00 },
+	    { label: '6.0 mm²', size: '6.0', strands: 84, gauge: 10.00 },
+	    { label: '6.0 mm²', size: '6.0', strands: 84, gauge: 11.00 },
+        ];
+
+        // Global State
+        let currency = '₹';
+        let batchEstimates = [];
+        let chartInstance = null;
+
+        // DOM Elements
+        const wireSizeSelect = document.getElementById('wireSizeSelect');
+        const strandGaugeInput = document.getElementById('strandGauge');
+        const numStrandsInput = document.getElementById('numStrands');
+        const coilLengthInput = document.getElementById('coilLength');
+        const copperRateInput = document.getElementById('copperRate');
+        const pvcCostInput = document.getElementById('pvcCost');
+        const overheadCostInput = document.getElementById('overheadCost');
+        const profitMarginInput = document.getElementById('profitMargin');
+        const marginValueSpan = document.getElementById('marginValue');
+
+        function initApp() {
+            renderPresets();
+            setupChart();
+            bindEvents();
+            calculate();
+        }
+
+        function renderPresets() {
+            const container = document.getElementById('presetButtons');
+            container.innerHTML = '';
+            PRESETS.forEach(p => {
+                const btn = document.createElement('button');
+                btn.className = 'px-2.5 py-1 text-xs rounded-lg font-mono border border-gray-200 dark:border-gray-700 hover:border-amber-500 dark:hover:border-amber-500 bg-gray-50 dark:bg-industrial-800 transition text-gray-700 dark:text-gray-300';
+                btn.textContent = `${p.label} (${p.strands}/${p.gauge})`;
+                btn.onclick = () => {
+                    wireSizeSelect.value = p.size;
+                    strandGaugeInput.value = p.gauge;
+                    numStrandsInput.value = p.strands;
+                    calculate();
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        function bindEvents() {
+            // Theme toggle
+            document.getElementById('themeToggle').onclick = () => {
+                document.documentElement.classList.toggle('dark');
+                setTimeout(() => calculate(), 100); // refresh chart colors
+            };
+
+            // Currency toggle
+            document.getElementById('currencyToggle').onclick = () => {
+                currency = currency === '₹' ? '$' : '₹';
+                document.getElementById('currencySymbolText').textContent = currency === '₹' ? '₹ (INR)' : '$ (USD)';
+                document.querySelectorAll('.currency-label').forEach(el => el.textContent = currency);
+                calculate();
+                renderBatchTable();
+            };
+
+            // Inputs change
+            [wireSizeSelect, strandGaugeInput, numStrandsInput, coilLengthInput, copperRateInput, pvcCostInput, overheadCostInput].forEach(el => {
+                el.addEventListener('input', calculate);
+            });
+
+            profitMarginInput.addEventListener('input', (e) => {
+                marginValueSpan.textContent = e.target.value + '%';
+                calculate();
+            });
+
+            // Wire Size Dropdown auto updates preset strand count
+            wireSizeSelect.addEventListener('change', (e) => {
+                const match = PRESETS.find(p => p.size === e.target.value);
+                if (match) {
+                    strandGaugeInput.value = match.gauge;
+                    numStrandsInput.value = match.strands;
+                }
+                calculate();
+            });
+
+            // Batch Queue Actions
+            document.getElementById('addQuoteBtn').onclick = addToBatch;
+            document.getElementById('clearBatchBtn').onclick = () => {
+                batchEstimates = [];
+                renderBatchTable();
+            };
+
+            // Export Modal
+            document.getElementById('exportPrintBtn').onclick = openModal;
+            document.getElementById('closeModalBtn').onclick = closeModal;
+            document.getElementById('triggerPrintBtn').onclick = () => window.print();
+        }
+
+        // Core Calculation Engine
+        function calculate() {
+            const gauge = parseFloat(strandGaugeInput.value) || 0;
+            const strands = parseFloat(numStrandsInput.value) || 0;
+            const length = parseFloat(coilLengthInput.value) || 90;
+            const copperRate = parseFloat(copperRateInput.value) || 0;
+            const pvcCost = parseFloat(pvcCostInput.value) || 0;
+            const overheadCost = parseFloat(overheadCostInput.value) || 0;
+            const marginPct = parseFloat(profitMarginInput.value) || 0;
+
+            // 1. Grams Copper for 90m = Gauge * Gauge * 405 * Strands
+            const standardGrams90m = (gauge * gauge * 405 * strands)/1000;
+            
+            // Scaled linearly for custom coil length
+            const totalGrams = standardGrams90m * (length / 90);
+            const totalKg = totalGrams / 1000;
+
+            // 2. Copper Cost
+            const copperCost = totalKg * copperRate;
+
+            // 3. Manufacturing Cost
+            const mfgCost = copperCost + pvcCost + overheadCost;
+
+            // 4. Selling Price & Profit
+            const profit = mfgCost * (marginPct / 100);
+            const sellPrice = mfgCost + profit;
+
+            // Update UI Labels
+            document.getElementById('copperWeightKg').textContent = `${totalKg.toFixed(3)} kg`;
+            document.getElementById('copperWeightGrams').textContent = `(${totalGrams.toFixed(2)} grams)`;
+            document.getElementById('copperCostVal').textContent = `${currency}${copperCost.toFixed(2)}`;
+            document.getElementById('currentCopperRateTag').textContent = copperRate;
+            document.getElementById('totalMfgCost').textContent = `${currency}${mfgCost.toFixed(2)}`;
+            document.getElementById('sellingPrice').textContent = `${currency}${sellPrice.toFixed(2)}`;
+            document.getElementById('profitPerCoil').textContent = `${currency}${profit.toFixed(2)}`;
+
+            // Chart Breakdown Percentages
+            const totalVal = sellPrice > 0 ? sellPrice : 1;
+            const cuPct = ((copperCost / totalVal) * 100).toFixed(1);
+            const pvcPct = ((pvcCost / totalVal) * 100).toFixed(1);
+            const ovhPct = ((overheadCost / totalVal) * 100).toFixed(1);
+            const prfPct = ((profit / totalVal) * 100).toFixed(1);
+
+            document.getElementById('pctCopper').textContent = `${cuPct}%`;
+            document.getElementById('pctPvc').textContent = `${pvcPct}%`;
+            document.getElementById('pctOverhead').textContent = `${ovhPct}%`;
+            document.getElementById('pctProfit').textContent = `${prfPct}%`;
+
+            updateChart([copperCost, pvcCost, overheadCost, profit]);
+
+            return {
+                size: wireSizeSelect.value,
+                gauge,
+                strands,
+                length,
+                totalKg,
+                totalGrams,
+                copperRate,
+                copperCost,
+                pvcCost,
+                overheadCost,
+                mfgCost,
+                profit,
+                marginPct,
+                sellPrice
+            };
+        }
+
+        function setupChart() {
+            const ctx = document.getElementById('costChart').getContext('2d');
+            chartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Copper Metal', 'PVC Insulation', 'Overheads', 'Profit Margin'],
+                    datasets: [{
+                        data: [70, 15, 5, 10],
+                        backgroundColor: [
+                            '#f59e0b', // Amber / Copper
+                            '#3b82f6', // Blue
+                            '#a855f7', // Purple
+                            '#10b981'  // Emerald
+                        ],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return ` ${context.label}: ${currency}${context.raw.toFixed(2)}`;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '70%'
+                }
+            });
+        }
+
+        function updateChart(dataArray) {
+            if (!chartInstance) return;
+            chartInstance.data.datasets[0].data = dataArray;
+            chartInstance.update();
+        }
+
+        function addToBatch() {
+            const currentData = calculate();
+            batchEstimates.push(currentData);
+            renderBatchTable();
+        }
+
+        function renderBatchTable() {
+            const tbody = document.getElementById('batchTableBody');
+            tbody.innerHTML = '';
+
+            if (batchEstimates.length === 0) {
+                tbody.innerHTML = `
+                    <tr id="emptyBatchRow" class="text-center font-sans text-gray-400 text-xs">
+                        <td colspan="8" class="py-6">No wire estimates added yet. Click "Add to Batch Quote" above.</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            batchEstimates.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-gray-50 dark:hover:bg-industrial-800/50 transition';
+                tr.innerHTML = `
+                    <td class="py-3 px-3 font-semibold font-sans">${item.size} sq mm</td>
+                    <td class="py-3 px-3">${item.strands} / ${item.gauge} mm</td>
+                    <td class="py-3 px-3">${item.length} m</td>
+                    <td class="py-3 px-3">${item.totalKg.toFixed(3)} kg</td>
+                    <td class="py-3 px-3">${currency}${item.mfgCost.toFixed(2)}</td>
+                    <td class="py-3 px-3 font-bold text-copper-500">${currency}${item.sellPrice.toFixed(2)}</td>
+                    <td class="py-3 px-3 text-emerald-500">${currency}${item.profit.toFixed(2)}</td>
+                    <td class="py-3 px-3 text-right">
+                        <button onclick="removeBatchItem(${index})" class="text-red-400 hover:text-red-600">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function removeBatchItem(index) {
+            batchEstimates.splice(index, 1);
+            renderBatchTable();
+        }
+
+        // Modal Handler
+        function openModal() {
+            const data = calculate();
+            document.getElementById('quoteDate').textContent = new Date().toISOString().split('T')[0];
+            document.getElementById('quoteRef').textContent = Math.floor(1000 + Math.random() * 9000);
+
+            document.getElementById('modalNominal').textContent = `${data.size} sq mm`;
+            document.getElementById('modalStrandSpec').textContent = `${data.strands} / ${data.gauge} mm`;
+            document.getElementById('modalCoilLen').textContent = `${data.length} Meters`;
+            document.getElementById('modalCuWeight').textContent = `${data.totalKg.toFixed(3)} Kg (${data.totalGrams.toFixed(1)}g)`;
+
+            document.getElementById('modalCuRate').textContent = data.copperRate;
+            document.getElementById('modalCuCost').textContent = `${currency}${data.copperCost.toFixed(2)}`;
+            document.getElementById('modalPvcCost').textContent = `${currency}${data.pvcCost.toFixed(2)}`;
+            document.getElementById('modalOverheadCost').textContent = `${currency}${data.overheadCost.toFixed(2)}`;
+            document.getElementById('modalMfgCost').textContent = `${currency}${data.mfgCost.toFixed(2)}`;
+            document.getElementById('modalMarginPct').textContent = data.marginPct;
+            document.getElementById('modalProfit').textContent = `${currency}${data.profit.toFixed(2)}`;
+            document.getElementById('modalSellPrice').textContent = `${currency}${data.sellPrice.toFixed(2)}`;
+
+            document.getElementById('printModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('printModal').classList.add('hidden');
+        }
+
+        // On Load Initializer
+        window.onload = initApp;
+    </script>
+</body>
+</html>
