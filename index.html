@@ -43,6 +43,9 @@
         .mono {
             font-family: 'JetBrains Mono', monospace;
         }
+        /* Hide default arrow on the foldable preset panel */
+        summary::-webkit-details-marker { display: none; }
+        summary { list-style: none; }
         /* Custom scrollbars */
         ::-webkit-scrollbar {
             width: 6px;
@@ -87,21 +90,24 @@
     </header>
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- Preset Standards Banner -->
-        <div class="mb-6 bg-white dark:bg-industrial-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-sm">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <!-- Preset Standards Banner (foldable) -->
+        <details id="presetPanel" class="group mb-6 bg-white dark:bg-industrial-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm">
+            <summary class="flex items-center justify-between gap-3 p-4 cursor-pointer select-none list-none">
                 <div class="flex items-center space-x-3">
                     <i class="fa-solid fa-sliders text-copper-500 text-xl"></i>
                     <div>
                         <h2 class="text-sm font-semibold text-gray-900 dark:text-white">Quick Preset Standard Configurations (IS 694 / IEC 60228)</h2>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">Select a standard size to automatically load nominal strand specs</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Tap to show or hide standard strand specs</p>
                     </div>
                 </div>
+                <i class="fa-solid fa-chevron-down text-gray-400 transition-transform duration-200 group-open:rotate-180"></i>
+            </summary>
+            <div class="px-4 pb-4 pt-3 border-t border-gray-100 dark:border-gray-800">
                 <div class="flex flex-wrap gap-2" id="presetButtons">
                     <!-- Javascript will populate preset pills -->
                 </div>
             </div>
-        </div>
+        </details>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <!-- Left Input Controls Panel -->
@@ -527,6 +533,10 @@
             setupChart();
             bindEvents();
             calculate();
+            // Open the preset panel on laptops, keep it folded on phones
+            if (window.innerWidth >= 768) {
+                document.getElementById('presetPanel').open = true;
+            }
         }
 
         function renderPresets() {
@@ -541,6 +551,10 @@
                     strandGaugeInput.value = p.gauge;
                     numStrandsInput.value = p.strands;
                     calculate();
+                    // On phones, fold the panel after choosing a preset
+                    if (window.innerWidth < 768) {
+                        document.getElementById('presetPanel').open = false;
+                    }
                 };
                 container.appendChild(btn);
             });
