@@ -136,6 +136,20 @@
                                 <option value="4.0">4.00 sq mm</option>
                                 <option value="6.0">6.00 sq mm</option>
                                 <option value="10.0">10.00 sq mm</option>
+                                <option value="16.0">16.00 sq mm</option>
+                            </select>
+                        </div>
+
+                        <!-- Number of Cores -->
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">
+                                Number of Cores
+                            </label>
+                            <select id="coreSelect" class="w-full bg-gray-50 dark:bg-industrial-800 border border-gray-300 dark:border-gray-700 rounded-xl px-3.5 py-2.5 text-sm font-medium focus:ring-2 focus:ring-copper-500 focus:outline-none">
+                                <option value="1">1 Core</option>
+                                <option value="2" selected>2 Core</option>
+                                <option value="3">3 Core</option>
+                                <option value="4">4 Core</option>
                             </select>
                         </div>
 
@@ -151,7 +165,7 @@
                         <!-- Number of Strands -->
                         <div>
                             <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">
-                                Number of Strands
+                                Number of Strands (per core)
                             </label>
                             <input type="number" id="numStrands" value="14" class="w-full bg-gray-50 dark:bg-industrial-800 border border-gray-300 dark:border-gray-700 rounded-xl px-3.5 py-2.5 text-sm font-mono font-medium focus:ring-2 focus:ring-copper-500 focus:outline-none">
                         </div>
@@ -163,7 +177,17 @@
                             </label>
                             <input type="number" id="coilLength" value="90" class="w-full bg-gray-50 dark:bg-industrial-800 border border-gray-300 dark:border-gray-700 rounded-xl px-3.5 py-2.5 text-sm font-mono font-medium focus:ring-2 focus:ring-copper-500 focus:outline-none">
                         </div>
+
+                        <!-- Bundle Weight -->
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5 flex items-center justify-between">
+                                <span>Bundle Weight / 90 m (Kg)</span>
+                                <i class="fa-solid fa-circle-info text-gray-400 text-xs" title="Auto-filled from the weight list for the chosen size, cores and gauge. You can edit it."></i>
+                            </label>
+                            <input type="number" step="0.001" id="bundleWeight" value="5.4" class="w-full bg-gray-50 dark:bg-industrial-800 border border-gray-300 dark:border-gray-700 rounded-xl px-3.5 py-2.5 text-sm font-mono font-medium focus:ring-2 focus:ring-copper-500 focus:outline-none">
+                        </div>
                     </div>
+                    <p id="bundleNote" class="hidden mt-3 text-[11px] text-amber-600 dark:text-amber-400"></p>
                 </div>
 
                 <!-- Cost Parameters Section -->
@@ -188,14 +212,14 @@
                                 </div>
                             </div>
 
-                            <!-- PVC Insulation Cost -->
+                            <!-- PVC Rate per Kg -->
                             <div>
                                 <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">
-                                    PVC Insulation / Coil (<span class="currency-label">₹</span>)
+                                    PVC Rate (<span class="currency-label">₹</span>/Kg)
                                 </label>
                                 <div class="relative">
                                     <span class="absolute left-3.5 top-2.5 text-gray-400 font-mono text-sm currency-label">₹</span>
-                                    <input type="number" id="pvcCost" value="120" class="w-full bg-gray-50 dark:bg-industrial-800 border border-gray-300 dark:border-gray-700 rounded-xl pl-8 pr-3.5 py-2.5 text-sm font-mono font-medium focus:ring-2 focus:ring-copper-500 focus:outline-none">
+                                    <input type="number" id="pvcRate" value="100" class="w-full bg-gray-50 dark:bg-industrial-800 border border-gray-300 dark:border-gray-700 rounded-xl pl-8 pr-3.5 py-2.5 text-sm font-mono font-medium focus:ring-2 focus:ring-copper-500 focus:outline-none">
                                 </div>
                             </div>
                         </div>
@@ -251,18 +275,18 @@
                     <div class="bg-white dark:bg-industrial-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-sm relative overflow-hidden group">
                         <div class="absolute top-0 right-0 w-16 h-16 bg-amber-500/5 rounded-bl-full pointer-events-none"></div>
                         <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Copper Weight / Coil</p>
-                        <h3 id="copperWeightKg" class="text-2xl font-extrabold text-gray-900 dark:text-white mono">0.510 kg</h3>
-                        <p id="copperWeightGrams" class="text-xs text-amber-600 dark:text-amber-400 font-mono mt-0.5">(510.30 grams)</p>
+                        <h3 id="copperWeightKg" class="text-2xl font-extrabold text-gray-900 dark:text-white mono">0.000 kg</h3>
+                        <p id="copperWeightGrams" class="text-xs text-amber-600 dark:text-amber-400 font-mono mt-0.5">(0.00 grams)</p>
                         <div class="mt-2 text-[10px] text-gray-400 flex items-center gap-1">
                             <i class="fa-solid fa-calculator"></i>
-                            <span>Gauge² × 405 × Strands</span>
+                            <span>Gauge² × 405 × Strands × Cores</span>
                         </div>
                     </div>
 
                     <!-- Pure Copper Cost Card -->
                     <div class="bg-white dark:bg-industrial-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-sm relative overflow-hidden">
                         <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Raw Copper Cost</p>
-                        <h3 id="copperCostVal" class="text-2xl font-extrabold text-copper-600 dark:text-copper-500 mono">₹433.76</h3>
+                        <h3 id="copperCostVal" class="text-2xl font-extrabold text-copper-600 dark:text-copper-500 mono">₹0</h3>
                         <p class="text-xs text-gray-400 mt-0.5">At <span id="currentCopperRateTag" class="mono">850</span>/<span class="weight-unit">kg</span></p>
                         <div class="mt-2 text-[10px] text-gray-400 flex items-center gap-1">
                             <i class="fa-solid fa-cube"></i>
@@ -270,10 +294,32 @@
                         </div>
                     </div>
 
+                    <!-- PVC Weight Card -->
+                    <div class="bg-white dark:bg-industrial-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-sm relative overflow-hidden">
+                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">PVC Weight / Coil</p>
+                        <h3 id="pvcWeightKg" class="text-2xl font-extrabold text-blue-600 dark:text-blue-400 mono">0.000 kg</h3>
+                        <p id="bundleWeightTag" class="text-xs text-gray-400 font-mono mt-0.5">Bundle 0 kg</p>
+                        <div class="mt-2 text-[10px] text-gray-400 flex items-center gap-1">
+                            <i class="fa-solid fa-minus"></i>
+                            <span>Bundle weight − Copper weight</span>
+                        </div>
+                    </div>
+
+                    <!-- PVC Cost Card -->
+                    <div class="bg-white dark:bg-industrial-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-sm relative overflow-hidden">
+                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">PVC Cost</p>
+                        <h3 id="pvcCostVal" class="text-2xl font-extrabold text-gray-900 dark:text-white mono">₹0</h3>
+                        <p class="text-xs text-gray-400 mt-0.5">At <span id="currentPvcRateTag" class="mono">100</span>/<span class="weight-unit">kg</span></p>
+                        <div class="mt-2 text-[10px] text-gray-400 flex items-center gap-1">
+                            <i class="fa-solid fa-layer-group"></i>
+                            <span>PVC weight × PVC rate</span>
+                        </div>
+                    </div>
+
                     <!-- Manufacturing Cost Card -->
                     <div class="bg-white dark:bg-industrial-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-sm">
                         <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Total Mfg Cost / Coil</p>
-                        <h3 id="totalMfgCost" class="text-2xl font-extrabold text-gray-900 dark:text-white mono">₹603.76</h3>
+                        <h3 id="totalMfgCost" class="text-2xl font-extrabold text-gray-900 dark:text-white mono">₹0</h3>
                         <p class="text-xs text-gray-400 mt-0.5">Copper + PVC + Labour + Overhead</p>
                         <div class="mt-2 text-[10px] text-gray-400 flex items-center gap-1">
                             <i class="fa-solid fa-industry"></i>
@@ -284,8 +330,8 @@
                     <!-- Suggested Selling Price Card -->
                     <div class="bg-gradient-to-br from-amber-500 to-copper-600 text-white rounded-2xl p-4 shadow-lg shadow-amber-500/20 relative overflow-hidden">
                         <p class="text-xs font-medium text-amber-100 mb-1">Selling Price / Coil</p>
-                        <h3 id="sellingPrice" class="text-2xl font-extrabold mono">₹694.32</h3>
-                        <p class="text-xs text-amber-100 mt-0.5">Profit: <span id="profitPerCoil" class="font-bold mono">₹90.56</span></p>
+                        <h3 id="sellingPrice" class="text-2xl font-extrabold mono">₹0</h3>
+                        <p class="text-xs text-amber-100 mt-0.5">Profit: <span id="profitPerCoil" class="font-bold mono">₹0</span></p>
                         <div class="mt-2 text-[10px] text-amber-200 flex items-center gap-1">
                             <i class="fa-solid fa-chart-line"></i>
                             <span>Target Margin Applied</span>
@@ -312,14 +358,14 @@
                                     <span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span>
                                     <span class="text-gray-600 dark:text-gray-300">Copper Metal</span>
                                 </div>
-                                <span id="pctCopper" class="font-bold mono">71.8%</span>
+                                <span id="pctCopper" class="font-bold mono">0.0%</span>
                             </div>
                             <div class="flex items-center justify-between p-2 rounded-lg bg-gray-50 dark:bg-industrial-800">
                                 <div class="flex items-center gap-2">
                                     <span class="w-3 h-3 rounded-full bg-blue-500 inline-block"></span>
                                     <span class="text-gray-600 dark:text-gray-300">PVC Insulation</span>
                                 </div>
-                                <span id="pctPvc" class="font-bold mono">19.9%</span>
+                                <span id="pctPvc" class="font-bold mono">0.0%</span>
                             </div>
                             <div class="flex items-center justify-between p-2 rounded-lg bg-gray-50 dark:bg-industrial-800">
                                 <div class="flex items-center gap-2">
@@ -333,14 +379,14 @@
                                     <span class="w-3 h-3 rounded-full bg-purple-500 inline-block"></span>
                                     <span class="text-gray-600 dark:text-gray-300">Overheads</span>
                                 </div>
-                                <span id="pctOverhead" class="font-bold mono">8.3%</span>
+                                <span id="pctOverhead" class="font-bold mono">0.0%</span>
                             </div>
                             <div class="flex items-center justify-between p-2 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                                 <div class="flex items-center gap-2">
                                     <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span>
                                     <span class="font-semibold">Profit Share</span>
                                 </div>
-                                <span id="pctProfit" class="font-bold mono">13.0%</span>
+                                <span id="pctProfit" class="font-bold mono">0.0%</span>
                             </div>
                         </div>
                     </div>
@@ -380,9 +426,11 @@
                     <thead>
                         <tr class="border-b border-gray-200 dark:border-gray-800 text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold">
                             <th class="py-3 px-3">Wire Spec</th>
+                            <th class="py-3 px-3">Cores</th>
                             <th class="py-3 px-3">Strands/Gauge</th>
                             <th class="py-3 px-3">Coil Length</th>
                             <th class="py-3 px-3">Cu Weight</th>
+                            <th class="py-3 px-3">PVC Weight</th>
                             <th class="py-3 px-3">Mfg Cost</th>
                             <th class="py-3 px-3">Selling Price</th>
                             <th class="py-3 px-3">Profit/Coil</th>
@@ -392,7 +440,7 @@
                     <tbody id="batchTableBody" class="divide-y divide-gray-100 dark:divide-gray-800 text-sm font-mono">
                         <!-- Batch items populated here -->
                         <tr id="emptyBatchRow" class="text-center font-sans text-gray-400 text-xs">
-                            <td colspan="8" class="py-6">No wire estimates added yet. Click "Add to Batch Quote" above.</td>
+                            <td colspan="10" class="py-6">No wire estimates added yet. Click "Add to Batch Quote" above.</td>
                         </tr>
                     </tbody>
                 </table>
@@ -425,9 +473,12 @@
                     <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Technical Parameters</h4>
                     <div class="grid grid-cols-2 gap-2 text-xs bg-gray-50 p-3 rounded-lg font-mono">
                         <div>Nominal Size: <span id="modalNominal" class="font-bold">1.0 sq mm</span></div>
-                        <div>Strand Spec: <span id="modalStrandSpec" class="font-bold">14 / 0.30 mm</span></div>
+                        <div>Cores: <span id="modalCores" class="font-bold">2 Core</span></div>
+                        <div>Strand Spec: <span id="modalStrandSpec" class="font-bold">14 / 10 gauge</span></div>
                         <div>Coil Length: <span id="modalCoilLen" class="font-bold">90 Meters</span></div>
-                        <div>Copper Weight: <span id="modalCuWeight" class="font-bold">0.510 Kg</span></div>
+                        <div>Bundle Weight: <span id="modalBundleWeight" class="font-bold">5.400 Kg</span></div>
+                        <div>Copper Weight: <span id="modalCuWeight" class="font-bold">0.000 Kg</span></div>
+                        <div>PVC Weight: <span id="modalPvcWeight" class="font-bold">0.000 Kg</span></div>
                     </div>
                 </div>
 
@@ -438,38 +489,38 @@
                         <tbody class="divide-y">
                             <tr>
                                 <td class="py-2 text-gray-600">Raw Copper Cost (@ <span id="modalCuRate">850</span>/<span class="weight-unit">kg</span>)</td>
-                                <td class="py-2 text-right font-bold" id="modalCuCost">₹433.76</td>
+                                <td class="py-2 text-right font-bold" id="modalCuCost">₹0</td>
                             </tr>
                             <tr>
-                                <td class="py-2 text-gray-600">PVC Insulation Cost</td>
-                                <td class="py-2 text-right font-bold" id="modalPvcCost">₹120.00</td>
+                                <td class="py-2 text-gray-600">PVC Insulation Cost (@ <span id="modalPvcRate">100</span>/<span class="weight-unit">kg</span>)</td>
+                                <td class="py-2 text-right font-bold" id="modalPvcCost">₹0</td>
                             </tr>
                             <tr>
                                 <td class="py-2 text-gray-600">Labour (<span id="modalLabourPct">10</span>% of Copper + PVC)</td>
-                                <td class="py-2 text-right font-bold" id="modalLabourCost">₹0.00</td>
+                                <td class="py-2 text-right font-bold" id="modalLabourCost">₹0</td>
                             </tr>
                             <tr>
                                 <td class="py-2 text-gray-600">Packing & Power Overhead Expenses</td>
-                                <td class="py-2 text-right font-bold" id="modalOverheadCost">₹50.00</td>
+                                <td class="py-2 text-right font-bold" id="modalOverheadCost">₹0</td>
                             </tr>
                             <tr class="bg-gray-50">
                                 <td class="py-2 font-bold text-gray-900">Total Manufacturing Cost</td>
-                                <td class="py-2 text-right font-bold text-gray-900" id="modalMfgCost">₹603.76</td>
+                                <td class="py-2 text-right font-bold text-gray-900" id="modalMfgCost">₹0</td>
                             </tr>
                             <tr>
                                 <td class="py-2 text-gray-600">Target Margin (<span id="modalMarginPct">15</span>%)</td>
-                                <td class="py-2 text-right font-bold text-emerald-600" id="modalProfit">₹90.56</td>
+                                <td class="py-2 text-right font-bold text-emerald-600" id="modalProfit">₹0</td>
                             </tr>
                             <tr class="border-t-2 border-gray-900 bg-amber-50">
                                 <td class="py-2.5 font-bold text-sm text-gray-900">Suggested Selling Price / Coil</td>
-                                <td class="py-2.5 text-right font-bold text-sm text-amber-700" id="modalSellPrice">₹694.32</td>
+                                <td class="py-2.5 text-right font-bold text-sm text-amber-700" id="modalSellPrice">₹0</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
 
                 <div class="text-[10px] text-gray-400 border-t pt-3 italic text-center">
-                    Formula applied: Grams Cu = Diameter² × 405 × Strands (scaled to coil length).
+                    Formula applied: Grams Cu = Diameter² × 405 × Strands × Cores (scaled to coil length). PVC Weight = Bundle Weight − Copper Weight.
                 </div>
             </div>
 
@@ -482,27 +533,59 @@
     </div>
 
     <script>
-        // Preset specifications mapping based on standard IS 694 / IEC 60228
+        // Preset specifications (strands per core) for each size at 9, 10 and 11 gauge
         const PRESETS = [
-            { label: '0.75 mm²', size: '0.75', strands: 24, gauge: 9.00 },
-            { label: '0.75 mm²', size: '0.75', strands: 24, gauge: 10.00 },
-            { label: '0.75 mm²', size: '0.75', strands: 24, gauge: 11.00 },
-            { label: '1.0 mm²', size: '1.0', strands: 14, gauge: 9.00 },
-            { label: '1.0 mm²', size: '1.0', strands: 14, gauge: 10.00 },
-            { label: '1.0 mm²', size: '1.0', strands: 14, gauge: 11.00 },
-            { label: '1.5 mm²', size: '1.5', strands: 22, gauge: 9.00 },
-            { label: '1.5 mm²', size: '1.5', strands: 22, gauge: 10.00 },
-            { label: '1.5 mm²', size: '1.5', strands: 22, gauge: 11.00 },
-            { label: '2.5 mm²', size: '2.5', strands: 36, gauge: 9.00 },
-            { label: '2.5 mm²', size: '2.5', strands: 36, gauge: 10.00 },
-            { label: '2.5 mm²', size: '2.5', strands: 36, gauge: 11.00 },
-            { label: '4.0 mm²', size: '4.0', strands: 56, gauge: 9.00 },
-            { label: '4.0 mm²', size: '4.0', strands: 56, gauge: 10.00 },
-            { label: '4.0 mm²', size: '4.0', strands: 56, gauge: 11.00 },
-            { label: '6.0 mm²', size: '6.0', strands: 84, gauge: 9.00 },
-            { label: '6.0 mm²', size: '6.0', strands: 84, gauge: 10.00 },
-            { label: '6.0 mm²', size: '6.0', strands: 84, gauge: 11.00 },
+            { label: '0.5 mm²',  size: '0.5',  strands: 7,   gauge: 9.00 },
+            { label: '0.5 mm²',  size: '0.5',  strands: 7,   gauge: 10.00 },
+            { label: '0.5 mm²',  size: '0.5',  strands: 7,   gauge: 11.00 },
+            { label: '0.75 mm²', size: '0.75', strands: 24,  gauge: 9.00 },
+            { label: '0.75 mm²', size: '0.75', strands: 24,  gauge: 10.00 },
+            { label: '0.75 mm²', size: '0.75', strands: 24,  gauge: 11.00 },
+            { label: '1.0 mm²',  size: '1.0',  strands: 14,  gauge: 9.00 },
+            { label: '1.0 mm²',  size: '1.0',  strands: 14,  gauge: 10.00 },
+            { label: '1.0 mm²',  size: '1.0',  strands: 14,  gauge: 11.00 },
+            { label: '1.5 mm²',  size: '1.5',  strands: 22,  gauge: 9.00 },
+            { label: '1.5 mm²',  size: '1.5',  strands: 22,  gauge: 10.00 },
+            { label: '1.5 mm²',  size: '1.5',  strands: 22,  gauge: 11.00 },
+            { label: '2.5 mm²',  size: '2.5',  strands: 36,  gauge: 9.00 },
+            { label: '2.5 mm²',  size: '2.5',  strands: 36,  gauge: 10.00 },
+            { label: '2.5 mm²',  size: '2.5',  strands: 36,  gauge: 11.00 },
+            { label: '4.0 mm²',  size: '4.0',  strands: 56,  gauge: 9.00 },
+            { label: '4.0 mm²',  size: '4.0',  strands: 56,  gauge: 10.00 },
+            { label: '4.0 mm²',  size: '4.0',  strands: 56,  gauge: 11.00 },
+            { label: '6.0 mm²',  size: '6.0',  strands: 84,  gauge: 9.00 },
+            { label: '6.0 mm²',  size: '6.0',  strands: 84,  gauge: 10.00 },
+            { label: '6.0 mm²',  size: '6.0',  strands: 84,  gauge: 11.00 },
+            { label: '10.0 mm²', size: '10.0', strands: 140, gauge: 9.00 },
+            { label: '10.0 mm²', size: '10.0', strands: 140, gauge: 10.00 },
+            { label: '10.0 mm²', size: '10.0', strands: 140, gauge: 11.00 },
+            { label: '16.0 mm²', size: '16.0', strands: 224, gauge: 9.00 },
+            { label: '16.0 mm²', size: '16.0', strands: 224, gauge: 10.00 },
+            { label: '16.0 mm²', size: '16.0', strands: 224, gauge: 11.00 },
         ];
+
+        // Bundle weight list: kg per 90 m (NEW weights) for 10 gauge.
+        // Key = nominal size, then number of cores. null = no value on the list.
+        const BUNDLE_WEIGHTS_10 = {
+            '0.5':  { 1: null, 2: 4.0,  3: 5.0,  4: 5.8  },
+            '0.75': { 1: null, 2: 4.5,  3: 6.3,  4: 7.7  },
+            '1.0':  { 1: null, 2: 5.4,  3: 7.7,  4: 9.0  },
+            '1.5':  { 1: null, 2: 6.9,  3: 9.3,  4: 12.0 },
+            '2.5':  { 1: null, 2: 10.5, 3: 13.0, 4: 16.7 },
+            '4.0':  { 1: null, 2: 15.0, 3: 18.8, 4: 22.8 },
+            '6.0':  { 1: null, 2: 19.5, 3: 24.0, 4: 31.5 },
+            '10.0': { 1: null, 2: 29.0, 3: 43.0, 4: 52.0 },
+            '16.0': { 1: null, 2: null, 3: 62.0, 4: 75.0 }
+        };
+
+        // Bundle weights per gauge. 9 and 11 gauge are PLACEHOLDERS (copy of 10 gauge).
+        // Replace the numbers inside BUNDLE_WEIGHTS[9] and BUNDLE_WEIGHTS[11] with the exact weights.
+        const BUNDLE_WEIGHTS = {
+            9:  JSON.parse(JSON.stringify(BUNDLE_WEIGHTS_10)),
+            10: BUNDLE_WEIGHTS_10,
+            11: JSON.parse(JSON.stringify(BUNDLE_WEIGHTS_10))
+        };
+        const PLACEHOLDER_GAUGES = [9, 11]; // remove a gauge from this list once its exact weights are entered
 
         // Global State
         let currency = '₹';
@@ -517,11 +600,14 @@
 
         // DOM Elements
         const wireSizeSelect = document.getElementById('wireSizeSelect');
+        const coreSelect = document.getElementById('coreSelect');
         const strandGaugeInput = document.getElementById('strandGauge');
         const numStrandsInput = document.getElementById('numStrands');
         const coilLengthInput = document.getElementById('coilLength');
+        const bundleWeightInput = document.getElementById('bundleWeight');
+        const bundleNote = document.getElementById('bundleNote');
         const copperRateInput = document.getElementById('copperRate');
-        const pvcCostInput = document.getElementById('pvcCost');
+        const pvcRateInput = document.getElementById('pvcRate');
         const overheadCostInput = document.getElementById('overheadCost');
         const profitMarginInput = document.getElementById('profitMargin');
         const marginValueSpan = document.getElementById('marginValue');
@@ -532,11 +618,23 @@
             renderPresets();
             setupChart();
             bindEvents();
+            updateBundleFromList();
             calculate();
             // Open the preset panel on laptops, keep it folded on phones
             if (window.innerWidth >= 768) {
                 document.getElementById('presetPanel').open = true;
             }
+        }
+
+        // Fill the bundle weight box from the list for the chosen gauge + size + cores.
+        // If the gauge is not 9, 10 or 11, the box is left as it is.
+        function updateBundleFromList() {
+            const gauge = parseFloat(strandGaugeInput.value);
+            const table = BUNDLE_WEIGHTS[gauge];
+            if (!table) return;
+            const row = table[wireSizeSelect.value];
+            const w = row ? row[coreSelect.value] : null;
+            bundleWeightInput.value = (w === null || w === undefined) ? '' : w;
         }
 
         function renderPresets() {
@@ -550,6 +648,7 @@
                     wireSizeSelect.value = p.size;
                     strandGaugeInput.value = p.gauge;
                     numStrandsInput.value = p.strands;
+                    updateBundleFromList();
                     calculate();
                     // On phones, fold the panel after choosing a preset
                     if (window.innerWidth < 768) {
@@ -577,8 +676,14 @@
             };
 
             // Inputs change
-            [wireSizeSelect, strandGaugeInput, numStrandsInput, coilLengthInput, copperRateInput, pvcCostInput, overheadCostInput].forEach(el => {
+            [numStrandsInput, coilLengthInput, bundleWeightInput, copperRateInput, pvcRateInput, overheadCostInput].forEach(el => {
                 el.addEventListener('input', calculate);
+            });
+
+            // Gauge change: load the bundle weight for that gauge
+            strandGaugeInput.addEventListener('input', () => {
+                updateBundleFromList();
+                calculate();
             });
 
             profitMarginInput.addEventListener('input', (e) => {
@@ -591,13 +696,23 @@
                 calculate();
             });
 
-            // Wire Size Dropdown auto updates preset strand count
+            // Wire Size Dropdown: auto-fill strands (keeps the current gauge if it is 9, 10 or 11, else uses 10)
             wireSizeSelect.addEventListener('change', (e) => {
-                const match = PRESETS.find(p => p.size === e.target.value);
+                const currentGauge = parseFloat(strandGaugeInput.value);
+                const match = PRESETS.find(p => p.size === e.target.value && p.gauge === currentGauge)
+                           || PRESETS.find(p => p.size === e.target.value && p.gauge === 10)
+                           || PRESETS.find(p => p.size === e.target.value);
                 if (match) {
                     strandGaugeInput.value = match.gauge;
                     numStrandsInput.value = match.strands;
                 }
+                updateBundleFromList();
+                calculate();
+            });
+
+            // Cores Dropdown: load list bundle weight
+            coreSelect.addEventListener('change', () => {
+                updateBundleFromList();
                 calculate();
             });
 
@@ -619,35 +734,68 @@
             const gauge = parseFloat(strandGaugeInput.value) || 0;
             const strands = parseFloat(numStrandsInput.value) || 0;
             const length = parseFloat(coilLengthInput.value) || 90;
+            const cores = parseInt(coreSelect.value) || 1;
+            const bundleInput = parseFloat(bundleWeightInput.value) || 0;
             const copperRate = parseFloat(copperRateInput.value) || 0;
-            const pvcCost = parseFloat(pvcCostInput.value) || 0;
+            const pvcRate = parseFloat(pvcRateInput.value) || 0;
             const overheadCost = parseFloat(overheadCostInput.value) || 0;
             const marginPct = parseFloat(profitMarginInput.value) || 0;
             const labourPct = parseFloat(labourPercentInput.value) || 0;
 
-            // 1. Grams Copper for 90m = Gauge * Gauge * 405 * Strands
+            // 1. Grams Copper for 90m (one core) = Gauge * Gauge * 405 * Strands
             const standardGrams90m = (gauge * gauge * 405 * strands)/1000;
 
-            // Scaled linearly for custom coil length
-            const totalGrams = standardGrams90m * (length / 90);
+            // Scaled linearly for custom coil length, multiplied by number of cores
+            const totalGrams = standardGrams90m * (length / 90) * cores;
             const totalKg = totalGrams / 1000;
 
-            // 2. Copper Cost
-            const copperCost = totalKg * copperRate;
+            // 2. Bundle weight (list is per 90 m, scaled to coil length)
+            const bundleKg = bundleInput * (length / 90);
 
-            // 3. Labour (on copper + PVC) and Manufacturing Cost
+            // 3. PVC weight = Bundle weight - Copper weight
+            const pvcKgRaw = bundleKg - totalKg;
+            const pvcKg = pvcKgRaw > 0 ? pvcKgRaw : 0;
+
+            // Notes under the spec inputs
+            const notes = [];
+            if (!bundleInput) {
+                notes.push('No bundle weight on the list for this size, core and gauge. Enter it manually.');
+            } else if (pvcKgRaw < 0) {
+                notes.push('Copper weight is more than the bundle weight, so PVC weight shows 0. Check the bundle weight, strands or gauge.');
+            }
+            if (!BUNDLE_WEIGHTS[gauge]) {
+                notes.push('The weight list covers 9, 10 and 11 gauge only. Edit the bundle weight by hand for this gauge.');
+            } else if (PLACEHOLDER_GAUGES.includes(gauge)) {
+                notes.push(`The ${gauge} gauge bundle weights are placeholders (same as 10 gauge) until exact weights are entered.`);
+            }
+            if (notes.length) {
+                bundleNote.textContent = notes.join(' ');
+                bundleNote.classList.remove('hidden');
+            } else {
+                bundleNote.classList.add('hidden');
+            }
+
+            // 4. Costs
+            const copperCost = totalKg * copperRate;
+            const pvcCost = pvcKg * pvcRate;
+
+            // 5. Labour (on copper + PVC) and Manufacturing Cost
             const labourCost = (copperCost + pvcCost) * (labourPct / 100);
             const mfgCost = copperCost + pvcCost + labourCost + overheadCost;
 
-            // 4. Selling Price & Profit
+            // 6. Selling Price & Profit
             const profit = mfgCost * (marginPct / 100);
             const sellPrice = mfgCost + profit;
 
             // Update UI Labels
             document.getElementById('copperWeightKg').textContent = `${totalKg.toFixed(3)} kg`;
-            document.getElementById('copperWeightGrams').textContent = `(${totalGrams.toFixed(2)} grams)`;
+            document.getElementById('copperWeightGrams').textContent = `(${totalGrams.toFixed(2)} grams, ${cores} core)`;
             document.getElementById('copperCostVal').textContent = `${currency}${fmt(copperCost)}`;
             document.getElementById('currentCopperRateTag').textContent = copperRate;
+            document.getElementById('pvcWeightKg').textContent = `${pvcKg.toFixed(3)} kg`;
+            document.getElementById('bundleWeightTag').textContent = `Bundle ${bundleKg.toFixed(3)} kg`;
+            document.getElementById('pvcCostVal').textContent = `${currency}${fmt(pvcCost)}`;
+            document.getElementById('currentPvcRateTag').textContent = pvcRate;
             document.getElementById('totalMfgCost').textContent = `${currency}${fmt(mfgCost)}`;
             document.getElementById('sellingPrice').textContent = `${currency}${fmt(sellPrice)}`;
             document.getElementById('profitPerCoil').textContent = `${currency}${fmt(profit)}`;
@@ -670,13 +818,17 @@
 
             return {
                 size: wireSizeSelect.value,
+                cores,
                 gauge,
                 strands,
                 length,
+                bundleKg,
                 totalKg,
                 totalGrams,
+                pvcKg,
                 copperRate,
                 copperCost,
+                pvcRate,
                 pvcCost,
                 labourPct,
                 labourCost,
@@ -744,7 +896,7 @@
             if (batchEstimates.length === 0) {
                 tbody.innerHTML = `
                     <tr id="emptyBatchRow" class="text-center font-sans text-gray-400 text-xs">
-                        <td colspan="8" class="py-6">No wire estimates added yet. Click "Add to Batch Quote" above.</td>
+                        <td colspan="10" class="py-6">No wire estimates added yet. Click "Add to Batch Quote" above.</td>
                     </tr>
                 `;
                 return;
@@ -755,9 +907,11 @@
                 tr.className = 'hover:bg-gray-50 dark:hover:bg-industrial-800/50 transition';
                 tr.innerHTML = `
                     <td class="py-3 px-3 font-semibold font-sans">${item.size} sq mm</td>
-                    <td class="py-3 px-3">${item.strands} / ${item.gauge} mm</td>
+                    <td class="py-3 px-3">${item.cores} core</td>
+                    <td class="py-3 px-3">${item.strands} / ${item.gauge}</td>
                     <td class="py-3 px-3">${item.length} m</td>
                     <td class="py-3 px-3">${item.totalKg.toFixed(3)} kg</td>
+                    <td class="py-3 px-3">${item.pvcKg.toFixed(3)} kg</td>
                     <td class="py-3 px-3">${currency}${fmt(item.mfgCost)}</td>
                     <td class="py-3 px-3 font-bold text-copper-500">${currency}${fmt(item.sellPrice)}</td>
                     <td class="py-3 px-3 text-emerald-500">${currency}${fmt(item.profit)}</td>
@@ -783,12 +937,16 @@
             document.getElementById('quoteRef').textContent = Math.floor(1000 + Math.random() * 9000);
 
             document.getElementById('modalNominal').textContent = `${data.size} sq mm`;
-            document.getElementById('modalStrandSpec').textContent = `${data.strands} / ${data.gauge} mm`;
+            document.getElementById('modalCores').textContent = `${data.cores} Core`;
+            document.getElementById('modalStrandSpec').textContent = `${data.strands} / ${data.gauge} gauge`;
             document.getElementById('modalCoilLen').textContent = `${data.length} Meters`;
+            document.getElementById('modalBundleWeight').textContent = `${data.bundleKg.toFixed(3)} Kg`;
             document.getElementById('modalCuWeight').textContent = `${data.totalKg.toFixed(3)} Kg (${data.totalGrams.toFixed(1)}g)`;
+            document.getElementById('modalPvcWeight').textContent = `${data.pvcKg.toFixed(3)} Kg`;
 
             document.getElementById('modalCuRate').textContent = data.copperRate;
             document.getElementById('modalCuCost').textContent = `${currency}${fmt(data.copperCost)}`;
+            document.getElementById('modalPvcRate').textContent = data.pvcRate;
             document.getElementById('modalPvcCost').textContent = `${currency}${fmt(data.pvcCost)}`;
             document.getElementById('modalLabourPct').textContent = data.labourPct;
             document.getElementById('modalLabourCost').textContent = `${currency}${fmt(data.labourCost)}`;
