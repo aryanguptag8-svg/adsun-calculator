@@ -194,11 +194,25 @@
                             </div>
                         </div>
 
+                        <!-- Labour Percentage Slider -->
+                        <div class="pt-2">
+                            <div class="flex justify-between items-center mb-1.5">
+                                <label class="text-xs font-semibold text-gray-600 dark:text-gray-400">Labour (% of Copper + PVC)</label>
+                                <span id="labourValue" class="text-sm font-bold font-mono text-copper-500">10%</span>
+                            </div>
+                            <input type="range" id="labourPercent" min="0" max="50" step="0.5" value="10" class="w-full accent-copper-500 h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                            <div class="flex justify-between text-[10px] text-gray-400 mt-1">
+                                <span>0%</span>
+                                <span>25%</span>
+                                <span>50%</span>
+                            </div>
+                        </div>
+
                         <!-- Overhead Expenses -->
                         <div>
                             <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5 flex items-center justify-between">
-                                <span>Packaging, Labor & Power Overheads / Coil (<span class="currency-label">₹</span>)</span>
-                                <i class="fa-solid fa-circle-info text-gray-400 text-xs" title="Master carton, spooling, electricity and labor cost per coil"></i>
+                                <span>Packaging & Power Overheads / Coil (<span class="currency-label">₹</span>)</span>
+                                <i class="fa-solid fa-circle-info text-gray-400 text-xs" title="Master carton, spooling and electricity cost per coil"></i>
                             </label>
                             <div class="relative">
                                 <span class="absolute left-3.5 top-2.5 text-gray-400 font-mono text-sm currency-label">₹</span>
@@ -254,7 +268,7 @@
                     <div class="bg-white dark:bg-industrial-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-sm">
                         <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Total Mfg Cost / Coil</p>
                         <h3 id="totalMfgCost" class="text-2xl font-extrabold text-gray-900 dark:text-white mono">₹603.76</h3>
-                        <p class="text-xs text-gray-400 mt-0.5">Copper + PVC + Overhead</p>
+                        <p class="text-xs text-gray-400 mt-0.5">Copper + PVC + Labour + Overhead</p>
                         <div class="mt-2 text-[10px] text-gray-400 flex items-center gap-1">
                             <i class="fa-solid fa-industry"></i>
                             <span>Break-even cost</span>
@@ -300,6 +314,13 @@
                                     <span class="text-gray-600 dark:text-gray-300">PVC Insulation</span>
                                 </div>
                                 <span id="pctPvc" class="font-bold mono">19.9%</span>
+                            </div>
+                            <div class="flex items-center justify-between p-2 rounded-lg bg-gray-50 dark:bg-industrial-800">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-3 h-3 rounded-full bg-orange-500 inline-block"></span>
+                                    <span class="text-gray-600 dark:text-gray-300">Labour</span>
+                                </div>
+                                <span id="pctLabour" class="font-bold mono">0.0%</span>
                             </div>
                             <div class="flex items-center justify-between p-2 rounded-lg bg-gray-50 dark:bg-industrial-800">
                                 <div class="flex items-center gap-2">
@@ -385,7 +406,7 @@
                 <div class="border-b pb-4 flex justify-between items-start">
                     <div>
                         <h2 class="text-xl font-bold text-gray-900">WIRE COST ESTIMATION SHEET</h2>
-                        <p class="text-xs text-gray-500">WireCraft Pro Manufacturing Engine</p>
+                        <p class="text-xs text-gray-500">Adsun Industries</p>
                     </div>
                     <div class="text-right text-xs text-gray-500">
                         <p>Date: <span id="quoteDate">2026-10-07</span></p>
@@ -418,7 +439,11 @@
                                 <td class="py-2 text-right font-bold" id="modalPvcCost">₹120.00</td>
                             </tr>
                             <tr>
-                                <td class="py-2 text-gray-600">Packing, Labor & Overhead Expenses</td>
+                                <td class="py-2 text-gray-600">Labour (<span id="modalLabourPct">10</span>% of Copper + PVC)</td>
+                                <td class="py-2 text-right font-bold" id="modalLabourCost">₹0.00</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 text-gray-600">Packing & Power Overhead Expenses</td>
                                 <td class="py-2 text-right font-bold" id="modalOverheadCost">₹50.00</td>
                             </tr>
                             <tr class="bg-gray-50">
@@ -466,17 +491,23 @@
             { label: '2.5 mm²', size: '2.5', strands: 36, gauge: 10.00 },
             { label: '2.5 mm²', size: '2.5', strands: 36, gauge: 11.00 },
             { label: '4.0 mm²', size: '4.0', strands: 56, gauge: 9.00 },
-	    { label: '4.0 mm²', size: '4.0', strands: 56, gauge: 10.00 },
-	    { label: '4.0 mm²', size: '4.0', strands: 56, gauge: 11.00 },
+            { label: '4.0 mm²', size: '4.0', strands: 56, gauge: 10.00 },
+            { label: '4.0 mm²', size: '4.0', strands: 56, gauge: 11.00 },
             { label: '6.0 mm²', size: '6.0', strands: 84, gauge: 9.00 },
-	    { label: '6.0 mm²', size: '6.0', strands: 84, gauge: 10.00 },
-	    { label: '6.0 mm²', size: '6.0', strands: 84, gauge: 11.00 },
+            { label: '6.0 mm²', size: '6.0', strands: 84, gauge: 10.00 },
+            { label: '6.0 mm²', size: '6.0', strands: 84, gauge: 11.00 },
         ];
 
         // Global State
         let currency = '₹';
         let batchEstimates = [];
         let chartInstance = null;
+
+        // Shows the full value with all its decimals (no rounding),
+        // only trimming tiny floating-point noise like 433.75500000001
+        function fmt(n) {
+            return parseFloat(Number(n).toPrecision(12)).toString();
+        }
 
         // DOM Elements
         const wireSizeSelect = document.getElementById('wireSizeSelect');
@@ -488,6 +519,8 @@
         const overheadCostInput = document.getElementById('overheadCost');
         const profitMarginInput = document.getElementById('profitMargin');
         const marginValueSpan = document.getElementById('marginValue');
+        const labourPercentInput = document.getElementById('labourPercent');
+        const labourValueSpan = document.getElementById('labourValue');
 
         function initApp() {
             renderPresets();
@@ -539,6 +572,11 @@
                 calculate();
             });
 
+            labourPercentInput.addEventListener('input', (e) => {
+                labourValueSpan.textContent = e.target.value + '%';
+                calculate();
+            });
+
             // Wire Size Dropdown auto updates preset strand count
             wireSizeSelect.addEventListener('change', (e) => {
                 const match = PRESETS.find(p => p.size === e.target.value);
@@ -571,10 +609,11 @@
             const pvcCost = parseFloat(pvcCostInput.value) || 0;
             const overheadCost = parseFloat(overheadCostInput.value) || 0;
             const marginPct = parseFloat(profitMarginInput.value) || 0;
+            const labourPct = parseFloat(labourPercentInput.value) || 0;
 
             // 1. Grams Copper for 90m = Gauge * Gauge * 405 * Strands
             const standardGrams90m = (gauge * gauge * 405 * strands)/1000;
-            
+
             // Scaled linearly for custom coil length
             const totalGrams = standardGrams90m * (length / 90);
             const totalKg = totalGrams / 1000;
@@ -582,8 +621,9 @@
             // 2. Copper Cost
             const copperCost = totalKg * copperRate;
 
-            // 3. Manufacturing Cost
-            const mfgCost = copperCost + pvcCost + overheadCost;
+            // 3. Labour (on copper + PVC) and Manufacturing Cost
+            const labourCost = (copperCost + pvcCost) * (labourPct / 100);
+            const mfgCost = copperCost + pvcCost + labourCost + overheadCost;
 
             // 4. Selling Price & Profit
             const profit = mfgCost * (marginPct / 100);
@@ -592,25 +632,27 @@
             // Update UI Labels
             document.getElementById('copperWeightKg').textContent = `${totalKg.toFixed(3)} kg`;
             document.getElementById('copperWeightGrams').textContent = `(${totalGrams.toFixed(2)} grams)`;
-            document.getElementById('copperCostVal').textContent = `${currency}${copperCost.toFixed(2)}`;
+            document.getElementById('copperCostVal').textContent = `${currency}${fmt(copperCost)}`;
             document.getElementById('currentCopperRateTag').textContent = copperRate;
-            document.getElementById('totalMfgCost').textContent = `${currency}${mfgCost.toFixed(2)}`;
-            document.getElementById('sellingPrice').textContent = `${currency}${sellPrice.toFixed(2)}`;
-            document.getElementById('profitPerCoil').textContent = `${currency}${profit.toFixed(2)}`;
+            document.getElementById('totalMfgCost').textContent = `${currency}${fmt(mfgCost)}`;
+            document.getElementById('sellingPrice').textContent = `${currency}${fmt(sellPrice)}`;
+            document.getElementById('profitPerCoil').textContent = `${currency}${fmt(profit)}`;
 
             // Chart Breakdown Percentages
             const totalVal = sellPrice > 0 ? sellPrice : 1;
             const cuPct = ((copperCost / totalVal) * 100).toFixed(1);
             const pvcPct = ((pvcCost / totalVal) * 100).toFixed(1);
+            const lbrPct = ((labourCost / totalVal) * 100).toFixed(1);
             const ovhPct = ((overheadCost / totalVal) * 100).toFixed(1);
             const prfPct = ((profit / totalVal) * 100).toFixed(1);
 
             document.getElementById('pctCopper').textContent = `${cuPct}%`;
             document.getElementById('pctPvc').textContent = `${pvcPct}%`;
+            document.getElementById('pctLabour').textContent = `${lbrPct}%`;
             document.getElementById('pctOverhead').textContent = `${ovhPct}%`;
             document.getElementById('pctProfit').textContent = `${prfPct}%`;
 
-            updateChart([copperCost, pvcCost, overheadCost, profit]);
+            updateChart([copperCost, pvcCost, labourCost, overheadCost, profit]);
 
             return {
                 size: wireSizeSelect.value,
@@ -622,6 +664,8 @@
                 copperRate,
                 copperCost,
                 pvcCost,
+                labourPct,
+                labourCost,
                 overheadCost,
                 mfgCost,
                 profit,
@@ -635,14 +679,15 @@
             chartInstance = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Copper Metal', 'PVC Insulation', 'Overheads', 'Profit Margin'],
+                    labels: ['Copper Metal', 'PVC Insulation', 'Labour', 'Overheads', 'Profit Margin'],
                     datasets: [{
-                        data: [70, 15, 5, 10],
+                        data: [70, 15, 5, 5, 10],
                         backgroundColor: [
                             '#f59e0b', // Amber / Copper
-                            '#3b82f6', // Blue
-                            '#a855f7', // Purple
-                            '#10b981'  // Emerald
+                            '#3b82f6', // Blue (PVC)
+                            '#f97316', // Orange (Labour)
+                            '#a855f7', // Purple (Overheads)
+                            '#10b981'  // Emerald (Profit)
                         ],
                         borderWidth: 0,
                         hoverOffset: 4
@@ -656,7 +701,7 @@
                         tooltip: {
                             callbacks: {
                                 label: function(context) {
-                                    return ` ${context.label}: ${currency}${context.raw.toFixed(2)}`;
+                                    return ` ${context.label}: ${currency}${fmt(context.raw)}`;
                                 }
                             }
                         }
@@ -699,9 +744,9 @@
                     <td class="py-3 px-3">${item.strands} / ${item.gauge} mm</td>
                     <td class="py-3 px-3">${item.length} m</td>
                     <td class="py-3 px-3">${item.totalKg.toFixed(3)} kg</td>
-                    <td class="py-3 px-3">${currency}${item.mfgCost.toFixed(2)}</td>
-                    <td class="py-3 px-3 font-bold text-copper-500">${currency}${item.sellPrice.toFixed(2)}</td>
-                    <td class="py-3 px-3 text-emerald-500">${currency}${item.profit.toFixed(2)}</td>
+                    <td class="py-3 px-3">${currency}${fmt(item.mfgCost)}</td>
+                    <td class="py-3 px-3 font-bold text-copper-500">${currency}${fmt(item.sellPrice)}</td>
+                    <td class="py-3 px-3 text-emerald-500">${currency}${fmt(item.profit)}</td>
                     <td class="py-3 px-3 text-right">
                         <button onclick="removeBatchItem(${index})" class="text-red-400 hover:text-red-600">
                             <i class="fa-solid fa-xmark"></i>
@@ -729,13 +774,15 @@
             document.getElementById('modalCuWeight').textContent = `${data.totalKg.toFixed(3)} Kg (${data.totalGrams.toFixed(1)}g)`;
 
             document.getElementById('modalCuRate').textContent = data.copperRate;
-            document.getElementById('modalCuCost').textContent = `${currency}${data.copperCost.toFixed(2)}`;
-            document.getElementById('modalPvcCost').textContent = `${currency}${data.pvcCost.toFixed(2)}`;
-            document.getElementById('modalOverheadCost').textContent = `${currency}${data.overheadCost.toFixed(2)}`;
-            document.getElementById('modalMfgCost').textContent = `${currency}${data.mfgCost.toFixed(2)}`;
+            document.getElementById('modalCuCost').textContent = `${currency}${fmt(data.copperCost)}`;
+            document.getElementById('modalPvcCost').textContent = `${currency}${fmt(data.pvcCost)}`;
+            document.getElementById('modalLabourPct').textContent = data.labourPct;
+            document.getElementById('modalLabourCost').textContent = `${currency}${fmt(data.labourCost)}`;
+            document.getElementById('modalOverheadCost').textContent = `${currency}${fmt(data.overheadCost)}`;
+            document.getElementById('modalMfgCost').textContent = `${currency}${fmt(data.mfgCost)}`;
             document.getElementById('modalMarginPct').textContent = data.marginPct;
-            document.getElementById('modalProfit').textContent = `${currency}${data.profit.toFixed(2)}`;
-            document.getElementById('modalSellPrice').textContent = `${currency}${data.sellPrice.toFixed(2)}`;
+            document.getElementById('modalProfit').textContent = `${currency}${fmt(data.profit)}`;
+            document.getElementById('modalSellPrice').textContent = `${currency}${fmt(data.sellPrice)}`;
 
             document.getElementById('printModal').classList.remove('hidden');
         }
